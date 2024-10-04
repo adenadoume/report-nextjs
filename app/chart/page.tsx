@@ -1,46 +1,68 @@
 "use client"
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import styles from './Chart.module.css'
+import { useEffect, useState } from "react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, TooltipProps } from 'recharts'
 
 interface SalesData {
   Column1: string
   Value: number
 }
 
-// Add a sample data array or fetch data from an API
-const data: SalesData[] = [
-  { Column1: "Jan", Value: 4000 },
-  { Column1: "Feb", Value: 3000 },
-  { Column1: "Mar", Value: 2000 },
-  { Column1: "Apr", Value: 2780 },
-  { Column1: "May", Value: 1890 },
-  { Column1: "Jun", Value: 2390 },
-]
+type CustomTooltipProps = TooltipProps<number, string> & {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+};
 
 export default function ChartPage() {
+  const [data, setData] = useState<SalesData[]>([])
+
+  useEffect(() => {
+    fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SalesReportDashboard-831s3k8ap4NTDf06p4mEBbj8wFiqkp.json')
+      .then(response => response.json())
+      .then(jsonData => {
+        const groupedData = jsonData.reduce((acc: { [key: string]: number }, item: SalesData) => {
+          if (item.Column1 && item.Value) {
+            acc[item.Column1] = (acc[item.Column1] || 0) + Math.round(Number(item.Value))
+          }
+          return acc
+        }, {})
+
+        const sortedData = Object.entries(groupedData)
+          .map(([Column1, Value]) => ({ Column1, Value: Value as number }))
+          .sort((a, b) => b.Value - a.Value)
+          .slice(0, 10)
+
+        setData(sortedData)
+      })
+  }, [])
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background p-2 border border-blue-500 rounded">
+          <p className="label">{`${label} : ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className={styles.chartContainer}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          width={500}
-          height={300}
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Column1" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="Value" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="p-4 h-full">
+      <h1 className="text-2xl font-bold mb-4">Chart September</h1>
+      <div className="h-[calc(100vh-150px)] border border-blue-500 rounded-lg p-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" tickFormatter={(value) => Math.round(value).toString()} />
+            <YAxis dataKey="Column1" type="category" width={150} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <Bar dataKey="Value" fill="#3b82f6" barSize={25} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }

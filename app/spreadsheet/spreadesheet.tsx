@@ -3,11 +3,11 @@ import { BarChart, FileSpreadsheet } from "lucide-react"
 
 export function Sidebar() {
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-64 bg-card text-card-foreground border-r border-blue-500 flex flex-col z-10">
+    <div className="flex flex-col w-64 bg-card text-card-foreground border-r border-blue-500">
       <div className="flex items-center justify-center h-16 border-b border-blue-500">
         <span className="text-2xl font-semibold">Sales Dashboard</span>
       </div>
-      <nav className="flex-1 p-4 overflow-y-auto">
+      <nav className="flex-1 p-4">
         <ul className="space-y-2">
           <li>
             <Link href="/chart" className="flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white transition-colors duration-200">

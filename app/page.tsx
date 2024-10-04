@@ -1,12 +1,8 @@
-import { Layout } from "@/components/app-layout"
-
-export default function Page() {
+export default function Home() {
   return (
-    <Layout>
-      <main>
-        <h1>Welcome to the Sales Dashboard</h1>
-        {/* Add more content here */}
-      </main>
-    </Layout>
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Welcome to the Sales Dashboard</h1>
+      <p>Select a chart or spreadsheet from the sidebar to view sales data.</p>
+    </div>
   )
 }

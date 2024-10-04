@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import {
   Table,
   TableBody,
@@ -18,65 +17,38 @@ interface SalesData {
   Value: number
 }
 
+// Sample data
+const sampleData: SalesData[] = [
+  { Column1: "Jan", Code: "A001", Description: "Product A", Quantity: 100, Value: 5000 },
+  { Column1: "Feb", Code: "B002", Description: "Product B", Quantity: 150, Value: 7500 },
+  { Column1: "Mar", Code: "C003", Description: "Product C", Quantity: 200, Value: 10000 },
+]
+
 export default function SpreadsheetPage() {
-  const [data, setData] = useState<SalesData[]>([])
-  const [selectedRows, setSelectedRows] = useState<number[]>([])
-
-  useEffect(() => {
-    fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SalesReportDashboard-831s3k8ap4NTDf06p4mEBbj8wFiqkp.json')
-      .then(response => response.json())
-      .then(jsonData => {
-        const roundedData = jsonData.map((item: SalesData) => ({
-          ...item,
-          Quantity: Math.round(item.Quantity),
-          Value: Math.round(item.Value)
-        }))
-        setData(roundedData)
-      })
-  }, [])
-
-  const toggleRowSelection = (index: number) => {
-    setSelectedRows(prev => 
-      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
-    )
-  }
-
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Sales Report for September</h1>
-      <div className="rounded-lg border border-blue-500 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-bold">Column1</TableHead>
-              <TableHead className="font-bold">Code</TableHead>
-              <TableHead className="font-bold">Description</TableHead>
-              <TableHead className="font-bold">Quantity</TableHead>
-              <TableHead className="font-bold">Value</TableHead>
+    <div className="container mx-auto py-10">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Month</TableHead>
+            <TableHead>Code</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Value</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sampleData.map((item, index) => (
+            <TableRow key={index}>
+              <TableCell>{item.Column1}</TableCell>
+              <TableCell>{item.Code}</TableCell>
+              <TableCell>{item.Description}</TableCell>
+              <TableCell>{item.Quantity}</TableCell>
+              <TableCell>{item.Value}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((item, index) => (
-              <TableRow 
-                key={index}
-                className={`
-                  cursor-pointer
-                  transition-colors duration-200
-                  hover:bg-blue-500 hover:bg-opacity-20
-                  ${selectedRows.includes(index) ? 'bg-blue-500 bg-opacity-40' : ''}
-                `}
-                onClick={() => toggleRowSelection(index)}
-              >
-                <TableCell>{item.Column1}</TableCell>
-                <TableCell>{item.Code}</TableCell>
-                <TableCell>{item.Description}</TableCell>
-                <TableCell>{item.Quantity}</TableCell>
-                <TableCell>{item.Value}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }

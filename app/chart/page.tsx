@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, TooltipProps } from 'recharts'
+import styles from './Chart.module.css'
 
 interface SalesData {
-  Column1: string
+  Supplier: string
   Value: number
 }
 
@@ -22,14 +23,14 @@ export default function ChartPage() {
       .then(response => response.json())
       .then(jsonData => {
         const groupedData = jsonData.reduce((acc: { [key: string]: number }, item: SalesData) => {
-          if (item.Column1 && item.Value) {
-            acc[item.Column1] = (acc[item.Column1] || 0) + Math.round(Number(item.Value))
+          if (item.Supplier && item.Value) {
+            acc[item.Supplier] = (acc[item.Supplier] || 0) + Math.round(Number(item.Value))
           }
           return acc
         }, {})
 
         const sortedData = Object.entries(groupedData)
-          .map(([Column1, Value]) => ({ Column1, Value: Value as number }))
+          .map(([Supplier, Value]) => ({ Supplier, Value: Value as number }))
           .sort((a, b) => b.Value - a.Value)
           .slice(0, 10)
 
@@ -49,14 +50,14 @@ export default function ChartPage() {
   };
 
   return (
-    <div className="p-4 h-full">
-      <h1 className="text-2xl font-bold mb-4">Chart September</h1>
+    <div className={styles.chartContainer}>
+      <h1 className="text-2xl font-bold mb-4">Sales Chart</h1>
       <div className="h-[calc(100vh-150px)] border border-blue-500 rounded-lg p-4">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" tickFormatter={(value) => Math.round(value).toString()} />
-            <YAxis dataKey="Column1" type="category" width={150} />
+            <YAxis dataKey="Supplier" type="category" width={150} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Bar dataKey="Value" fill="#3b82f6" barSize={25} />

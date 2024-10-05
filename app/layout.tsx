@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
+import { TopMenu } from "@/components/top-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -39,8 +40,9 @@ export default function RootLayout({
         >
           <div className="flex h-screen bg-background">
             <Sidebar />
-            <div className="flex-1 flex flex-col overflow-hidden ml-64"> {/* Added ml-64 for left margin */}
-              <header className="flex items-center justify-end p-4 border-b border-blue-500">
+            <div className="flex-1 flex flex-col overflow-hidden ml-64">
+              <header className="flex items-center p-4 border-b border-blue-500">
+                <TopMenu />
                 <ModeToggle />
               </header>
               <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">

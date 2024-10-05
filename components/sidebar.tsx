@@ -18,7 +18,7 @@ export function Sidebar() {
           <li>
             <Link href="/spreadsheet" className="flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white transition-colors duration-200">
               <FileSpreadsheet className="mr-2" />
-              Sales Report September
+              Sales by Supplier
             </Link>
           </li>
         </ul>

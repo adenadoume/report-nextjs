@@ -187,7 +187,7 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
         </Select>
         <Button 
           onClick={handleDownload}
-          className="bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200"
+          className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800 transition-colors duration-200"
         >
           <Download className="mr-2 h-4 w-4" /> Download Excel
         </Button>
@@ -216,7 +216,7 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 bg-blue-600 dark:bg-blue-800 text-white p-4 rounded-lg shadow-lg flex justify-between">
+      <div className="mt-4 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-lg shadow-lg flex justify-between">
         <p className="font-bold">Totals{selectedSupplier ? ` for ${selectedSupplier}` : ''}:</p>
         <p>Quantity: {totals.Quantity.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
         <p>Value: {totals.Value.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>

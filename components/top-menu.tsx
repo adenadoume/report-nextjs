@@ -20,8 +20,8 @@ export function TopMenu() {
             href={`/${month.toLowerCase()}`}
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
               pathname === `/${month.toLowerCase()}` 
-                ? "bg-blue-500 text-white dark:bg-blue-600" 
-                : "text-muted-foreground hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600"
+                ? "bg-blue-600 text-white dark:bg-blue-700" 
+                : "text-muted-foreground hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
             }`}
           >
             {month}

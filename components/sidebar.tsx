@@ -28,8 +28,8 @@ export function Sidebar() {
           href={item.href} 
           className={`flex items-center px-4 py-3 mt-2 rounded-lg transition-colors duration-200 ${
             pathname === item.href
-              ? "bg-blue-500 text-white"
-              : "hover:bg-blue-500 hover:text-white"
+              ? "bg-blue-600 text-white dark:bg-blue-700"
+              : "hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
           }`}
         >
           <item.icon className="w-6 h-6 flex-shrink-0" />

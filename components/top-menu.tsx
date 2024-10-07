@@ -33,7 +33,7 @@ export function TopMenu() {
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
               currentMonth === month.toLowerCase()
                 ? "bg-blue-600 text-white dark:bg-blue-700" 
-                : "text-muted-foreground hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
+                : "text-black dark:text-muted-foreground hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
             }`}
           >
             {month}

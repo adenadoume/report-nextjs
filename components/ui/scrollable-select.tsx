@@ -10,12 +10,12 @@ interface ScrollableSelectProps {
 export function ScrollableSelect({ options, placeholder, onValueChange }: ScrollableSelectProps) {
   return (
     <Select onValueChange={onValueChange}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-[180px] text-black dark:text-white">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="max-h-[400px] overflow-y-auto">
         {options.map((option) => (
-          <SelectItem key={option} value={option}>
+          <SelectItem key={option} value={option} className="text-black dark:text-white">
             {option}
           </SelectItem>
         ))}

@@ -9,14 +9,13 @@ export function Sidebar() {
   const router = useRouter()
   const [currentMonth, setCurrentMonth] = useState('september')
   const [isExpanded, setIsExpanded] = useState(false)
-  const [selectedItem, setSelectedItem] = useState('')
+  // Remove the following line
+  // const [selectedItem, setSelectedItem] = useState('')
 
   useEffect(() => {
     const pathParts = pathname.split('/')
     const month = pathParts[1] || 'september'
-    const reportType = pathParts[2] || ''
     setCurrentMonth(month)
-    setSelectedItem(reportType ? `/${month}/${reportType}` : `/${month}`)
   }, [pathname])
 
   const menuItems = [
@@ -26,16 +25,13 @@ export function Sidebar() {
   ]
 
   const handleItemClick = (href: string) => {
-    setSelectedItem(href)
     router.push(href)
   }
 
   const isSelected = (href: string) => {
     if (href === `/${currentMonth}`) {
-      // For Sales Report by Supplier, check if the pathname is exactly '/{month}'
       return pathname === href
     }
-    // For other reports, check if the pathname starts with the href
     return pathname.startsWith(href)
   }
 

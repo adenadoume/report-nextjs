@@ -3,9 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { TopMenu } from "@/components/top-menu";
-import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
-import Image from "next/image";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,17 +32,7 @@ export default function RootLayout({
         >
           <div className="flex flex-col h-screen bg-background">
             <header className="flex items-center p-4 border-b border-blue-500">
-              <div className="mr-4">
-                <Image 
-                  src="/agop.pro-logo.png" 
-                  alt="Agop.pro Logo" 
-                  width={96} 
-                  height={96} 
-                  className="transition-transform duration-300 hover:scale-110"
-                />
-              </div>
               <TopMenu />
-              <ModeToggle />
             </header>
             <div className="flex flex-1 overflow-hidden">
               <Sidebar />

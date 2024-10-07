@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { ModeToggle } from "@/components/mode-toggle"
 
 const months = [
   "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
@@ -15,8 +17,15 @@ export function TopMenu() {
   const reportType = pathParts[2] || ''
 
   return (
-    <nav className="flex-1 flex justify-center overflow-x-auto">
-      <div className="flex space-x-1 bg-card p-1 rounded-lg">
+    <nav className="flex-1 flex justify-between items-center w-full">
+      <Image 
+        src="/WS-logo.jpg" 
+        alt="WS Logo" 
+        width={60} 
+        height={60} 
+        className="mr-2"
+      />
+      <div className="flex items-center space-x-1 bg-card p-1 rounded-lg">
         {months.map((month) => (
           <Link
             key={month}
@@ -30,6 +39,16 @@ export function TopMenu() {
             {month}
           </Link>
         ))}
+      </div>
+      <div className="flex items-center">
+        <ModeToggle />
+        <div className="w-5" /> {/* This creates a 20px gap */}
+        <Image 
+          src="/agop.pro-logo.png" 
+          alt="Agop.pro Logo" 
+          width={80} 
+          height={80}
+        />
       </div>
     </nav>
   )

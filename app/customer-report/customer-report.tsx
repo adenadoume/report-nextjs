@@ -16,61 +16,71 @@ import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
 
 interface SalesData {
-  Supplier: string
   Code: string
-  Description: string
+  Customer: string
   Quantity: number
   Value: number
 }
 
 interface CSVRow {
-  Supplier: string
   Code: string
-  Description: string
+  Customer: string
   Quantity: string
   Value: string
 }
 
-interface SpreadsheetPageProps {
+interface CustomerReportPageProps {
   month: string
 }
 
-export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
+export default function CustomerReportPage({ month }: CustomerReportPageProps) {
   const [data, setData] = useState<SalesData[]>([])
   const [totals, setTotals] = useState({ Quantity: 0, Value: 0 })
-  const [suppliers, setSuppliers] = useState<string[]>([])
-  const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null)
+  const [customers, setCustomers] = useState<string[]>([])
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/${month}.csv`)
-        const csvText = await response.text()
+        console.log(`Fetching data for ${month}...`);
+        const response = await fetch(`/${month}_customer.csv`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const csvText = await response.text();
+        console.log(`CSV content for ${month} (first 200 chars):`, csvText.slice(0, 200));
+
         Papa.parse<CSVRow>(csvText, {
           complete: (result) => {
-            const parsedData: SalesData[] = result.data.map((row) => ({
-              Supplier: row.Supplier || '',
-              Code: row.Code || '',
-              Description: row.Description || '',
-              Quantity: parseFloat(row.Quantity || '0'),
-              Value: parseFloat(row.Value || '0')
-            })).filter((item) => item.Supplier && item.Code)
+            console.log(`Parsed data for ${month} (first 5 rows):`, result.data.slice(0, 5));
+            if (result.errors.length > 0) {
+              console.error(`Parsing errors for ${month}:`, result.errors);
+            }
+            const parsedData: SalesData[] = result.data
+              .map((row) => ({
+                Code: row.Code || '',
+                Customer: row.Customer || '',
+                Quantity: parseFloat(row.Quantity || '0'),
+                Value: parseFloat(row.Value || '0')
+              }))
+              .filter((item) => item.Code && item.Customer);
 
-            const sortedData = parsedData.sort((a, b) => a.Supplier.localeCompare(b.Supplier))
-            setData(sortedData)
-            calculateTotals(sortedData)
-            setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])
+            console.log(`Filtered data for ${month} (first 5 rows):`, parsedData.slice(0, 5));
+            const sortedData = parsedData.sort((a, b) => b.Value - a.Value);
+            setData(sortedData);
+            calculateTotals(sortedData);
+            setCustomers(['All', ...Array.from(new Set(sortedData.map(item => item.Customer)))]);
           },
           header: true,
           skipEmptyLines: true
-        })
+        });
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error(`Error fetching data for ${month}:`, error);
       }
-    }
+    };
 
-    fetchData()
-  }, [month])
+    fetchData();
+  }, [month]);
 
   const calculateTotals = (filteredData: SalesData[]) => {
     const totals = filteredData.reduce((acc, item) => {
@@ -84,19 +94,19 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
     })
   }
 
-  const handleSupplierChange = (value: string) => {
-    const newSelectedSupplier = value === 'All' ? null : value
-    setSelectedSupplier(newSelectedSupplier)
+  const handleCustomerChange = (value: string) => {
+    const newSelectedCustomer = value === 'All' ? null : value
+    setSelectedCustomer(newSelectedCustomer)
     
-    const filteredData = newSelectedSupplier
-      ? data.filter(item => item.Supplier === newSelectedSupplier)
+    const filteredData = newSelectedCustomer
+      ? data.filter(item => item.Customer === newSelectedCustomer)
       : data
     
     calculateTotals(filteredData)
   }
 
-  const filteredData = selectedSupplier
-    ? data.filter(item => item.Supplier === selectedSupplier)
+  const filteredData = selectedCustomer
+    ? data.filter(item => item.Customer === selectedCustomer)
     : data
 
   const handleDownload = () => {
@@ -107,9 +117,8 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
     const dataWithSums = [
       ...filteredData,
       {
-        Supplier: 'Total',
-        Code: '',
-        Description: '',
+        Code: 'Total',
+        Customer: '',
         Quantity: filteredData.reduce((sum, item) => sum + item.Quantity, 0),
         Value: filteredData.reduce((sum, item) => sum + item.Value, 0)
       }
@@ -120,9 +129,8 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
 
     // Set column widths
     const columnWidths = [
-      { wch: 15 }, // Supplier
       { wch: 10 }, // Code
-      { wch: 40 }, // Description
+      { wch: 40 }, // Customer
       { wch: 10 }, // Quantity
       { wch: 10 }, // Value
     ]
@@ -166,21 +174,21 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
 
     // Generate the Excel file with the new naming convention including the year
     const monthName = month.charAt(0).toUpperCase() + month.slice(1)
-    XLSX.writeFile(workbook, `Sales by Supplier - ${monthName} 24.xlsx`)
+    XLSX.writeFile(workbook, `Sales by Customer - ${monthName} 24.xlsx`)
   }
 
   return (
     <div className="relative flex flex-col h-full bg-background text-foreground">
-      <h1 className="text-2xl font-bold mb-4">{`Sales by Supplier - ${month.charAt(0).toUpperCase() + month.slice(1)}`}</h1>
+      <h1 className="text-2xl font-bold mb-4">{`Sales Report by Customer - ${month.charAt(0).toUpperCase() + month.slice(1)}`}</h1>
       <div className="flex justify-between items-center mb-4">
-        <Select onValueChange={handleSupplierChange}>
+        <Select onValueChange={handleCustomerChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a supplier" />
+            <SelectValue placeholder="Select a customer" />
           </SelectTrigger>
           <SelectContent>
-            {suppliers.map((supplier) => (
-              <SelectItem key={supplier} value={supplier}>
-                {supplier}
+            {customers.map((customer) => (
+              <SelectItem key={customer} value={customer}>
+                {customer}
               </SelectItem>
             ))}
           </SelectContent>
@@ -196,9 +204,8 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted">
-              <TableHead className="text-muted-foreground">Supplier</TableHead>
               <TableHead className="text-muted-foreground">Code</TableHead>
-              <TableHead className="text-muted-foreground">Description</TableHead>
+              <TableHead className="text-muted-foreground">Customer</TableHead>
               <TableHead className="text-muted-foreground">Quantity</TableHead>
               <TableHead className="text-muted-foreground">Value</TableHead>
             </TableRow>
@@ -206,9 +213,8 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
           <TableBody>
             {filteredData.map((item, index) => (
               <TableRow key={index} className="border-b border-muted">
-                <TableCell>{item.Supplier}</TableCell>
                 <TableCell>{item.Code}</TableCell>
-                <TableCell>{item.Description}</TableCell>
+                <TableCell>{item.Customer}</TableCell>
                 <TableCell>{Math.round(item.Quantity).toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</TableCell>
                 <TableCell>{Math.round(item.Value).toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</TableCell>
               </TableRow>
@@ -217,7 +223,7 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
         </Table>
       </div>
       <div className="mt-4 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-lg shadow-lg flex justify-between">
-        <p className="font-bold">Totals{selectedSupplier ? ` for ${selectedSupplier}` : ''}:</p>
+        <p className="font-bold">Totals{selectedCustomer ? ` for ${selectedCustomer}` : ''}:</p>
         <p>Quantity: {totals.Quantity.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
         <p>Value: {totals.Value.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
       </div>

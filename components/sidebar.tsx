@@ -1,20 +1,32 @@
 "use client"
 
-import Link from "next/link"
 import { PersonIcon, GlobeIcon, ArchiveIcon } from "@radix-ui/react-icons"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 
 export function Sidebar() {
   const pathname = usePathname()
-  const currentMonth = pathname.split('/')[1] || 'september'
+  const router = useRouter()
+  const [currentMonth, setCurrentMonth] = useState('september')
   const [isExpanded, setIsExpanded] = useState(false)
+  const [selectedItem, setSelectedItem] = useState('')
+
+  useEffect(() => {
+    const month = pathname.split('/')[1] || 'september'
+    setCurrentMonth(month)
+    setSelectedItem(pathname)
+  }, [pathname])
 
   const menuItems = [
-    { icon: PersonIcon, title: "Sales Report by Customer", href: "#" },
+    { icon: PersonIcon, title: "Sales Report by Customer", href: `/${currentMonth}/customer` },
     { icon: GlobeIcon, title: "Sales Report by Supplier", href: `/${currentMonth}` },
     { icon: ArchiveIcon, title: "Stock Report", href: "#" },
   ]
+
+  const handleItemClick = (href: string) => {
+    setSelectedItem(href)
+    router.push(href)
+  }
 
   return (
     <div 
@@ -23,11 +35,11 @@ export function Sidebar() {
       onMouseLeave={() => setIsExpanded(false)}
     >
       {menuItems.map((item, index) => (
-        <Link 
+        <button 
           key={index}
-          href={item.href} 
+          onClick={() => handleItemClick(item.href)}
           className={`flex items-center px-4 py-3 mt-2 rounded-lg transition-colors duration-200 ${
-            pathname === item.href
+            selectedItem === item.href
               ? "bg-blue-600 text-white dark:bg-blue-700"
               : "hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
           }`}
@@ -36,7 +48,7 @@ export function Sidebar() {
           <span className={`ml-4 whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
             {item.title}
           </span>
-        </Link>
+        </button>
       ))}
     </div>
   )

@@ -1,5 +1,5 @@
-import SpreadsheetPage from './spreadsheet'
+import SpreadsheetPage from '../spreadsheet/spreadsheet'
 
 export default function SeptemberPage() {
-  return <SpreadsheetPage />
+  return <SpreadsheetPage month="september" />
 }

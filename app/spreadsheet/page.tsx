@@ -70,7 +70,10 @@ export default function SpreadsheetPage() {
       acc.Value += Math.round(item.Value)
       return acc
     }, { Quantity: 0, Value: 0 })
-    setTotals(totals)
+    setTotals({
+      Quantity: Math.round(totals.Quantity),
+      Value: Math.round(totals.Value)
+    })
   }
 
   const handleSupplierChange = (value: string) => {
@@ -180,8 +183,8 @@ export default function SpreadsheetPage() {
                   <TableCell>{item.Supplier}</TableCell>
                   <TableCell>{item.Code}</TableCell>
                   <TableCell>{item.Description}</TableCell>
-                  <TableCell>{Math.round(item.Quantity)}</TableCell>
-                  <TableCell>{Math.round(item.Value)}</TableCell>
+                  <TableCell>{Math.round(item.Quantity).toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</TableCell>
+                  <TableCell>{Math.round(item.Value).toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -190,8 +193,8 @@ export default function SpreadsheetPage() {
       </div>
       <div className="mt-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg flex justify-between">
         <p className="font-bold">Totals{selectedSupplier ? ` for ${selectedSupplier}` : ''}:</p>
-        <p>Quantity: {totals.Quantity.toLocaleString()}</p>
-        <p>Value: {totals.Value.toLocaleString()}</p>
+        <p>Quantity: {totals.Quantity.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
+        <p>Value: {totals.Value.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
       </div>
     </div>
   )

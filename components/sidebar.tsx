@@ -1,28 +1,43 @@
+"use client"
+
 import Link from "next/link"
-import { BarChart, FileSpreadsheet } from "lucide-react"
+import { PersonIcon, GlobeIcon, ArchiveIcon } from "@radix-ui/react-icons"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
 export function Sidebar() {
+  const pathname = usePathname()
+  const currentMonth = pathname.split('/')[1] || 'september'
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const menuItems = [
+    { icon: PersonIcon, title: "Sales Report by Customer", href: "#" },
+    { icon: GlobeIcon, title: "Sales Report by Supplier", href: `/${currentMonth}` },
+    { icon: ArchiveIcon, title: "Stock Report", href: "#" },
+  ]
+
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-64 bg-card text-card-foreground border-r border-blue-500 flex flex-col z-10">
-      <div className="flex items-center justify-center h-16 border-b border-blue-500">
-        <span className="text-2xl font-semibold">Sales Dashboard</span>
-      </div>
-      <nav className="flex-1 p-4 overflow-y-auto">
-        <ul className="space-y-2">
-          <li>
-            <Link href="/chart" className="flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white transition-colors duration-200">
-              <BarChart className="mr-2" />
-              Chart September
-            </Link>
-          </li>
-          <li>
-            <Link href="/spreadsheet" className="flex items-center p-2 rounded-lg hover:bg-blue-500 hover:text-white transition-colors duration-200">
-              <FileSpreadsheet className="mr-2" />
-              Sales by Supplier
-            </Link>
-          </li>
-        </ul>
-      </nav>
+    <div 
+      className={`flex flex-col py-4 overflow-hidden bg-card text-card-foreground border-r border-blue-500 transition-all duration-300 ease-in-out ${isExpanded ? 'w-64' : 'w-16'}`}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+    >
+      {menuItems.map((item, index) => (
+        <Link 
+          key={index}
+          href={item.href} 
+          className={`flex items-center px-4 py-3 mt-2 rounded-lg transition-colors duration-200 ${
+            pathname === item.href
+              ? "bg-blue-500 text-white"
+              : "hover:bg-blue-500 hover:text-white"
+          }`}
+        >
+          <item.icon className="w-6 h-6 flex-shrink-0" />
+          <span className={`ml-4 whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+            {item.title}
+          </span>
+        </Link>
+      ))}
     </div>
   )
 }

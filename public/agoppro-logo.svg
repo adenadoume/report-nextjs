@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="269" height="237" viewBox="0 0 269 237">
+  <g id="Group_4" data-name="Group 4" transform="translate(-2197 -2309)">
+    <g id="Ellipse_1" data-name="Ellipse 1" transform="translate(2197 2309)" fill="#fff" stroke="#000" stroke-width="3">
+      <circle cx="105" cy="105" r="105" stroke="none"/>
+      <circle cx="105" cy="105" r="103.5" fill="none"/>
+    </g>
+    <circle id="Ellipse_2" data-name="Ellipse 2" cx="98" cy="98" r="98" transform="translate(2204 2316)"/>
+    <text id="AGOP" transform="translate(2236 2420)" fill="#fff" font-size="51" font-family="Philosopher-Bold, Philosopher" font-weight="700"><tspan x="0" y="0">AGOP</tspan></text>
+    <text id="_.PRO" data-name=".PRO" transform="translate(2268 2455)" fill="#fff" font-size="51" font-family="Philosopher-Bold, Philosopher" font-weight="700" opacity="0.997"><tspan x="0" y="0">.</tspan><tspan y="0" font-size="31">PRO</tspan></text>
+    <g id="Ellipse_3" data-name="Ellipse 3" transform="translate(2335 2416)" fill="#fff" stroke="#000" stroke-width="2">
+      <ellipse cx="65.5" cy="65" rx="65.5" ry="65" stroke="none"/>
+      <ellipse cx="65.5" cy="65" rx="64.5" ry="64" fill="none"/>
+    </g>
+    <path id="Path_1" data-name="Path 1" d="M59.629,0A59.6,59.6,0,1,1,8.477,28.966,59.629,59.629,0,0,1,59.629,0Z" transform="translate(2340.401 2421.672)"/>
+    <text id="Giorgos_Agopian" data-name="Giorgos
+Agopian" transform="translate(2401 2477)" fill="#fff" font-size="20" font-family="Philosopher-Italic, Philosopher" font-style="italic"><tspan x="-34.05" y="0">Giorgos</tspan><tspan x="-35.5" y="21">Agopian</tspan></text>
+  </g>
+</svg>

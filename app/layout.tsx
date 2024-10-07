@@ -6,7 +6,6 @@ import { TopMenu } from "@/components/top-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
 import Image from "next/image";
-import Link from "next/link";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +34,7 @@ export default function RootLayout({
         >
           <div className="flex flex-col h-screen bg-background">
             <header className="flex items-center p-4 border-b border-blue-500">
-              <Link href="https://agop.pro" target="_blank" rel="noopener noreferrer" className="mr-4">
+              <div className="mr-4">
                 <Image 
                   src="/agop.pro-logo.png" 
                   alt="Agop.pro Logo" 
@@ -43,7 +42,7 @@ export default function RootLayout({
                   height={96} 
                   className="transition-transform duration-300 hover:scale-110"
                 />
-              </Link>
+              </div>
               <TopMenu />
               <ModeToggle />
             </header>

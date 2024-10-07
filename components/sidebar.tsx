@@ -12,20 +12,31 @@ export function Sidebar() {
   const [selectedItem, setSelectedItem] = useState('')
 
   useEffect(() => {
-    const month = pathname.split('/')[1] || 'september'
+    const pathParts = pathname.split('/')
+    const month = pathParts[1] || 'september'
+    const reportType = pathParts[2] || ''
     setCurrentMonth(month)
-    setSelectedItem(pathname)
+    setSelectedItem(reportType ? `/${month}/${reportType}` : `/${month}`)
   }, [pathname])
 
   const menuItems = [
     { icon: PersonIcon, title: "Sales Report by Customer", href: `/${currentMonth}/customer` },
     { icon: GlobeIcon, title: "Sales Report by Supplier", href: `/${currentMonth}` },
-    { icon: ArchiveIcon, title: "Stock Report", href: "#" },
+    { icon: ArchiveIcon, title: "Stock Report", href: `/${currentMonth}/stock` },
   ]
 
   const handleItemClick = (href: string) => {
     setSelectedItem(href)
     router.push(href)
+  }
+
+  const isSelected = (href: string) => {
+    if (href === `/${currentMonth}`) {
+      // For Sales Report by Supplier, check if the pathname is exactly '/{month}'
+      return pathname === href
+    }
+    // For other reports, check if the pathname starts with the href
+    return pathname.startsWith(href)
   }
 
   return (
@@ -39,7 +50,7 @@ export function Sidebar() {
           key={index}
           onClick={() => handleItemClick(item.href)}
           className={`flex items-center px-4 py-3 mt-2 rounded-lg transition-colors duration-200 ${
-            selectedItem === item.href
+            isSelected(item.href)
               ? "bg-blue-600 text-white dark:bg-blue-700"
               : "hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
           }`}

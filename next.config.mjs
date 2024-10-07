@@ -8,6 +8,10 @@ const nextConfig = {
     })
     return config
   },
+  // Add this line to explicitly allow serving files from public directory
+  publicRuntimeConfig: {
+    staticFolder: '/public',
+  },
 }
 
 export default nextConfig

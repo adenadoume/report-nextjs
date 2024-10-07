@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
+import { ScrollableSelect } from "@/components/ui/scrollable-select"
 
 interface SalesData {
   Code: string
@@ -181,18 +182,11 @@ export default function CustomerReportPage({ month }: CustomerReportPageProps) {
     <div className="relative flex flex-col h-full bg-background text-foreground">
       <h1 className="text-2xl font-bold mb-4">{`Sales Report by Customer - ${month.charAt(0).toUpperCase() + month.slice(1)}`}</h1>
       <div className="flex justify-between items-center mb-4">
-        <Select onValueChange={handleCustomerChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a customer" />
-          </SelectTrigger>
-          <SelectContent>
-            {customers.map((customer) => (
-              <SelectItem key={customer} value={customer}>
-                {customer}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ScrollableSelect
+          options={customers}
+          placeholder="Select a customer"
+          onValueChange={handleCustomerChange}
+        />
         <Button 
           onClick={handleDownload}
           className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800 transition-colors duration-200"

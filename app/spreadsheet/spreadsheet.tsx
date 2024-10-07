@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
+import { ScrollableSelect } from "@/components/ui/scrollable-select"
 
 interface SalesData {
   Supplier: string
@@ -131,14 +132,14 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
     // Add styles
     const headerStyle = {
       font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: "3B82F6" } }, // Blue background
+      fill: { fgColor: { rgb: "3B82F6" } } // Blue background
     }
     const rowStyle = {
-      fill: { fgColor: { rgb: "EFF6FF" } }, // Light blue background
+      fill: { fgColor: { rgb: "EFF6FF" } } // Light blue background
     }
     const sumRowStyle = {
       font: { bold: true },
-      fill: { fgColor: { rgb: "BBDEFB" } }, // Light blue background for sum row
+      fill: { fgColor: { rgb: "BBDEFB" } } // Light blue background for sum row
     }
 
     // Apply styles to header
@@ -173,18 +174,11 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
     <div className="relative flex flex-col h-full bg-background text-foreground">
       <h1 className="text-2xl font-bold mb-4">{`Sales by Supplier - ${month.charAt(0).toUpperCase() + month.slice(1)}`}</h1>
       <div className="flex justify-between items-center mb-4">
-        <Select onValueChange={handleSupplierChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a supplier" />
-          </SelectTrigger>
-          <SelectContent>
-            {suppliers.map((supplier) => (
-              <SelectItem key={supplier} value={supplier}>
-                {supplier}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ScrollableSelect
+          options={suppliers}
+          placeholder="Select a supplier"
+          onValueChange={handleSupplierChange}
+        />
         <Button 
           onClick={handleDownload}
           className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800 transition-colors duration-200"

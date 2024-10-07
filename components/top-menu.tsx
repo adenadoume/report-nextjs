@@ -10,6 +10,9 @@ const months = [
 
 export function TopMenu() {
   const pathname = usePathname()
+  const pathParts = pathname.split('/')
+  const currentMonth = pathParts[1] || 'september'
+  const reportType = pathParts[2] || ''
 
   return (
     <nav className="flex-1 flex justify-center overflow-x-auto">
@@ -17,9 +20,9 @@ export function TopMenu() {
         {months.map((month) => (
           <Link
             key={month}
-            href={`/${month.toLowerCase()}`}
+            href={`/${month.toLowerCase()}${reportType ? `/${reportType}` : ''}`}
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-              pathname === `/${month.toLowerCase()}` 
+              currentMonth === month.toLowerCase()
                 ? "bg-blue-600 text-white dark:bg-blue-700" 
                 : "text-muted-foreground hover:bg-blue-600 hover:text-white dark:hover:bg-blue-700"
             }`}

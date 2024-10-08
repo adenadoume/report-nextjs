@@ -56,7 +56,16 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
               Value: parseFloat(row.Value || '0')
             })).filter((item) => item.Supplier && item.Code)
 
-            const sortedData = parsedData.sort((a, b) => a.Supplier.localeCompare(b.Supplier))
+            const sortedData = parsedData.sort((a, b) => {
+              // First, sort by Supplier name
+              const supplierComparison = a.Supplier.localeCompare(b.Supplier);
+              if (supplierComparison !== 0) {
+                return supplierComparison;
+              }
+              // If Suppliers are the same, sort by Value (higher to lower)
+              return b.Value - a.Value;
+            });
+
             setData(sortedData)
             calculateTotals(sortedData)
             setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])

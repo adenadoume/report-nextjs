@@ -1,5 +1,5 @@
 import CustomerReportPage from '../../customer-report/customer-report'
 
-export default function SeptemberCustomerReport() {
-  return <CustomerReportPage month="september" />
+export default function OctoberCustomerReport() {
+  return <CustomerReportPage month="october" />
 }

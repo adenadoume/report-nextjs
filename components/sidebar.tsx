@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const [currentMonth, setCurrentMonth] = useState('september')
+  const [currentMonth, setCurrentMonth] = useState('october')
   const [isExpanded, setIsExpanded] = useState(false)
   // Remove the following line
   // const [selectedItem, setSelectedItem] = useState('')

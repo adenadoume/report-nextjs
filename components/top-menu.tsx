@@ -13,7 +13,7 @@ const months = [
 export function TopMenu() {
   const pathname = usePathname()
   const pathParts = pathname.split('/')
-  const currentMonth = pathParts[1] || 'september'
+  const currentMonth = pathParts[1] || 'october'
   const reportType = pathParts[2] || ''
 
   return (

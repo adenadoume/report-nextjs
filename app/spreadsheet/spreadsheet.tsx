@@ -37,9 +37,42 @@ interface SpreadsheetPageProps {
 
 export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
   const [data, setData] = useState<SalesData[]>([])
-  const [totals, setTotals] = useState({ Quantity: 0, Value: 0 })
+  const [totals, setTotals] = useState({ Quantity: 0, Value: 0, YearValue: 0 })
   const [suppliers, setSuppliers] = useState<string[]>([])
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchYearlyTotal = async () => {
+      const months = ['january', 'february', 'march', 'april', 'may', 'june', 
+                     'july', 'august', 'september', 'october', 'november', 'december']
+      let yearTotal = 0
+
+      for (const m of months) {
+        try {
+          const response = await fetch(`/${m}.csv`)
+          if (!response.ok) continue
+          const csvText = await response.text()
+          
+          Papa.parse<CSVRow>(csvText, {
+            complete: (result) => {
+              const monthTotal = result.data
+                .map(row => parseFloat(row.Value || '0'))
+                .reduce((sum, value) => sum + value, 0)
+              yearTotal += monthTotal
+            },
+            header: true,
+            skipEmptyLines: true
+          })
+        } catch (error) {
+          console.error(`Error fetching data for ${m}:`, error)
+        }
+      }
+      
+      setTotals(prev => ({ ...prev, YearValue: Math.round(yearTotal) }))
+    }
+
+    fetchYearlyTotal()
+  }, []) // Run once on component mount
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,23 +81,20 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
         const csvText = await response.text()
         Papa.parse<CSVRow>(csvText, {
           complete: (result) => {
-            const parsedData: SalesData[] = result.data.map((row) => ({
-              Supplier: row.Supplier || '',
-              Code: row.Code || '',
-              Description: row.Description || '',
-              Quantity: parseFloat(row.Quantity || '0'),
-              Value: parseFloat(row.Value || '0')
-            })).filter((item) => item.Supplier && item.Code)
+            const parsedData: SalesData[] = result.data
+              .map((row) => ({
+                Supplier: row.Supplier || '',
+                Code: row.Code || '',
+                Description: row.Description || '',
+                Quantity: parseFloat(row.Quantity || '0'),
+                Value: parseFloat(row.Value || '0')
+              }))
+              .filter((item) => item.Supplier && item.Code)
 
             const sortedData = parsedData.sort((a, b) => {
-              // First, sort by Supplier name
-              const supplierComparison = a.Supplier.localeCompare(b.Supplier);
-              if (supplierComparison !== 0) {
-                return supplierComparison;
-              }
-              // If Suppliers are the same, sort by Value (higher to lower)
-              return b.Value - a.Value;
-            });
+              const supplierComparison = a.Supplier.localeCompare(b.Supplier)
+              return supplierComparison !== 0 ? supplierComparison : b.Value - a.Value
+            })
 
             setData(sortedData)
             calculateTotals(sortedData)
@@ -87,10 +117,11 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
       acc.Value += Math.round(item.Value)
       return acc
     }, { Quantity: 0, Value: 0 })
-    setTotals({
+    setTotals(prev => ({
+      ...prev,
       Quantity: Math.round(totals.Quantity),
       Value: Math.round(totals.Value)
-    })
+    }))
   }
 
   const handleSupplierChange = (value: string) => {
@@ -221,6 +252,7 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
       <div className="mt-4 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-lg shadow-lg flex justify-between">
         <p className="font-bold">Totals{selectedSupplier ? ` for ${selectedSupplier}` : ''}:</p>
         <p>Quantity: {totals.Quantity.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
+        <p>Value (Year): {totals.YearValue.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
         <p>Value: {totals.Value.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
       </div>
     </div>

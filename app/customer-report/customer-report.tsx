@@ -35,7 +35,7 @@ interface CustomerReportPageProps {
 
 export default function CustomerReportPage({ month }: CustomerReportPageProps) {
   const [data, setData] = useState<SalesData[]>([])
-  const [totals, setTotals] = useState({ Quantity: 0, Value: 0 })
+  const [totals, setTotals] = useState({ Quantity: 0, Value: 0, YearValue: 0 })
   const [customers, setCustomers] = useState<string[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
 
@@ -82,16 +82,50 @@ export default function CustomerReportPage({ month }: CustomerReportPageProps) {
     fetchData();
   }, [month]);
 
+  useEffect(() => {
+    const fetchYearlyTotal = async () => {
+      const months = ['january', 'february', 'march', 'april', 'may', 'june', 
+                     'july', 'august', 'september', 'october', 'november', 'december']
+      let yearTotal = 0
+
+      for (const m of months) {
+        try {
+          const response = await fetch(`/${m}_customer.csv`)
+          if (!response.ok) continue
+          const csvText = await response.text()
+          
+          Papa.parse<CSVRow>(csvText, {
+            complete: (result) => {
+              const monthTotal = result.data
+                .map(row => parseFloat(row.Value || '0'))
+                .reduce((sum, value) => sum + value, 0)
+              yearTotal += monthTotal
+            },
+            header: true,
+            skipEmptyLines: true
+          })
+        } catch (error) {
+          console.error(`Error fetching data for ${m}:`, error)
+        }
+      }
+      
+      setTotals(prev => ({ ...prev, YearValue: Math.round(yearTotal) }))
+    }
+
+    fetchYearlyTotal()
+  }, []) // Run once on component mount
+
   const calculateTotals = (filteredData: SalesData[]) => {
     const totals = filteredData.reduce((acc, item) => {
       acc.Quantity += Math.round(item.Quantity)
       acc.Value += Math.round(item.Value)
       return acc
     }, { Quantity: 0, Value: 0 })
-    setTotals({
+    setTotals(prev => ({
+      ...prev, // Preserve YearValue
       Quantity: Math.round(totals.Quantity),
       Value: Math.round(totals.Value)
-    })
+    }))
   }
 
   const handleCustomerChange = (value: string) => {
@@ -218,6 +252,7 @@ export default function CustomerReportPage({ month }: CustomerReportPageProps) {
       <div className="mt-4 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-lg shadow-lg flex justify-between">
         <p className="font-bold">Totals{selectedCustomer ? ` for ${selectedCustomer}` : ''}:</p>
         <p>Quantity: {totals.Quantity.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
+        <p>Value (Year): {totals.YearValue.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
         <p>Value: {totals.Value.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 }).replace(/,/g, '.')}</p>
       </div>
     </div>

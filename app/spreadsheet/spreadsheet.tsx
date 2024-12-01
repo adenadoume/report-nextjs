@@ -77,32 +77,44 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch the file with proper encoding handling
         const response = await fetch(`/${month}.csv`)
-        const csvText = await response.text()
-        Papa.parse<CSVRow>(csvText, {
-          complete: (result) => {
-            const parsedData: SalesData[] = result.data
-              .map((row) => ({
-                Supplier: row.Supplier || '',
-                Code: row.Code || '',
-                Description: row.Description || '',
-                Quantity: parseFloat(row.Quantity || '0'),
-                Value: parseFloat(row.Value || '0')
-              }))
-              .filter((item) => item.Supplier && item.Code)
+        // Convert the response to a blob first
+        const blob = await response.blob()
+        // Create a FileReader to handle the encoding
+        const reader = new FileReader()
+        
+        reader.onload = (e) => {
+          const csvText = e.target?.result as string
+          Papa.parse<CSVRow>(csvText, {
+            complete: (result) => {
+              const parsedData: SalesData[] = result.data
+                .map((row) => ({
+                  Supplier: row.Supplier || '',
+                  Code: row.Code || '',
+                  Description: row.Description || '',
+                  Quantity: parseFloat(row.Quantity || '0'),
+                  Value: parseFloat(row.Value || '0')
+                }))
+                .filter((item) => item.Supplier && item.Code)
 
-            const sortedData = parsedData.sort((a, b) => {
-              const supplierComparison = a.Supplier.localeCompare(b.Supplier)
-              return supplierComparison !== 0 ? supplierComparison : b.Value - a.Value
-            })
+              const sortedData = parsedData.sort((a, b) => {
+                const supplierComparison = a.Supplier.localeCompare(b.Supplier, 'el')
+                return supplierComparison !== 0 ? supplierComparison : b.Value - a.Value
+              })
 
-            setData(sortedData)
-            calculateTotals(sortedData)
-            setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])
-          },
-          header: true,
-          skipEmptyLines: true
-        })
+              setData(sortedData)
+              calculateTotals(sortedData)
+              setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])
+            },
+            header: true,
+            skipEmptyLines: true,
+            encoding: "ISO-8859-7", // Specify Greek ISO encoding
+          })
+        }
+
+        // Read the blob as text with ISO-8859-7 encoding
+        reader.readAsText(blob, "ISO-8859-7")
       } catch (error) {
         console.error('Error fetching data:', error)
       }

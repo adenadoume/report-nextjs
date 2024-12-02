@@ -51,36 +51,42 @@ export default function StockReportPage({ month }: StockReportPageProps) {
     const fetchData = async () => {
       try {
         const response = await fetch(`/${month}_stock.csv`)
-        const csvText = await response.text()
-        Papa.parse<CSVRow>(csvText, {
-          complete: (result) => {
-            const parsedData: StockData[] = result.data
-              .map((row) => ({
-                Supplier: row.Supplier || '',
-                Code: row.Code || '',
-                Description: row.Description || '',
-                Q: parseFloat(row.Q || '0'),
-                'Cost Price': parseFloat(row['Cost Price'] || '0'),
-                'Cost * Q': parseFloat(row['Cost * Q'] || '0'),
-                'Sales Price': parseFloat(row['Sales Price'] || '0'),
-                'Sales Price * Q': parseFloat(row['Sales Price * Q'] || '0')
-              }))
-              .filter((item) => item.Supplier && item.Code && item['Sales Price * Q'] > 0)
+        const blob = await response.blob()
+        const reader = new FileReader()
+        
+        reader.onload = (e) => {
+          const csvText = e.target?.result as string
+          Papa.parse<CSVRow>(csvText, {
+            complete: (result) => {
+              const parsedData: StockData[] = result.data
+                .map((row) => ({
+                  Supplier: row.Supplier || '',
+                  Code: row.Code || '',
+                  Description: row.Description || '',
+                  Q: parseFloat(row.Q || '0'),
+                  'Cost Price': parseFloat(row['Cost Price'] || '0'),
+                  'Cost * Q': parseFloat(row['Cost * Q'] || '0'),
+                  'Sales Price': parseFloat(row['Sales Price'] || '0'),
+                  'Sales Price * Q': parseFloat(row['Sales Price * Q'] || '0')
+                }))
+                .filter((item) => item.Supplier && item.Code)
 
-            const sortedData = parsedData.sort((a, b) => {
-              if (a.Supplier !== b.Supplier) {
-                return a.Supplier.localeCompare(b.Supplier)
-              }
-              return b['Sales Price * Q'] - a['Sales Price * Q']
-            })
-            
-            setData(sortedData)
-            calculateTotals(sortedData)
-            setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])
-          },
-          header: true,
-          skipEmptyLines: true
-        })
+              const sortedData = parsedData.sort((a, b) => {
+                const supplierComparison = a.Supplier.localeCompare(b.Supplier, 'el')
+                return supplierComparison !== 0 ? supplierComparison : b['Sales Price * Q'] - a['Sales Price * Q']
+              })
+
+              setData(sortedData)
+              calculateTotals(sortedData)
+              setSuppliers(['All', ...Array.from(new Set(sortedData.map(item => item.Supplier)))])
+            },
+            header: true,
+            skipEmptyLines: true,
+            encoding: "ISO-8859-7"
+          })
+        }
+
+        reader.readAsText(blob, "ISO-8859-7")
       } catch (error) {
         console.error('Error fetching data:', error)
       }

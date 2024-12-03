@@ -50,7 +50,12 @@ export default function StockReportPage({ month }: StockReportPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log(`Attempting to fetch: /${month}_stock.csv`)
         const response = await fetch(`/${month}_stock.csv`)
+        if (!response.ok) {
+          console.error(`Failed to fetch ${month}_stock.csv:`, response.status, response.statusText)
+          return
+        }
         const blob = await response.blob()
         const reader = new FileReader()
         
@@ -82,11 +87,11 @@ export default function StockReportPage({ month }: StockReportPageProps) {
             },
             header: true,
             skipEmptyLines: true,
-            encoding: "ISO-8859-7"
+            encoding: "UTF-8"
           })
         }
 
-        reader.readAsText(blob, "ISO-8859-7")
+        reader.readAsText(blob, "UTF-8")
       } catch (error) {
         console.error('Error fetching data:', error)
       }

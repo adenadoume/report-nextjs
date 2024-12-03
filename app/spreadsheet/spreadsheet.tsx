@@ -51,37 +51,45 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
         try {
           const response = await fetch(`/${m}.csv`)
           if (!response.ok) continue
-          const csvText = await response.text()
+          const blob = await response.blob()
+          const reader = new FileReader()
           
-          Papa.parse<CSVRow>(csvText, {
-            complete: (result) => {
-              const monthTotal = result.data
-                .map(row => parseFloat(row.Value || '0'))
-                .reduce((sum, value) => sum + value, 0)
-              yearTotal += monthTotal
-            },
-            header: true,
-            skipEmptyLines: true
-          })
+          reader.onload = (e) => {
+            const csvText = e.target?.result as string
+            Papa.parse<CSVRow>(csvText, {
+              complete: (result) => {
+                const monthTotal = result.data
+                  .map(row => parseFloat(row.Value || '0'))
+                  .reduce((sum, value) => sum + value, 0)
+                yearTotal += monthTotal
+                setTotals(prev => ({ ...prev, YearValue: Math.round(yearTotal) }))
+              },
+              header: true,
+              skipEmptyLines: true,
+              encoding: "UTF-8"
+            })
+          }
+          
+          reader.readAsText(blob, "UTF-8")
         } catch (error) {
           console.error(`Error fetching data for ${m}:`, error)
         }
       }
-      
-      setTotals(prev => ({ ...prev, YearValue: Math.round(yearTotal) }))
     }
 
     fetchYearlyTotal()
-  }, []) // Run once on component mount
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch the file with proper encoding handling
+        console.log(`Attempting to fetch: /${month}.csv`)
         const response = await fetch(`/${month}.csv`)
-        // Convert the response to a blob first
+        if (!response.ok) {
+          console.error(`Failed to fetch ${month}.csv:`, response.status, response.statusText)
+          return
+        }
         const blob = await response.blob()
-        // Create a FileReader to handle the encoding
         const reader = new FileReader()
         
         reader.onload = (e) => {
@@ -109,12 +117,11 @@ export default function SpreadsheetPage({ month }: SpreadsheetPageProps) {
             },
             header: true,
             skipEmptyLines: true,
-            encoding: "ISO-8859-7", // Specify Greek ISO encoding
+            encoding: "UTF-8"
           })
         }
 
-        // Read the blob as text with ISO-8859-7 encoding
-        reader.readAsText(blob, "ISO-8859-7")
+        reader.readAsText(blob, "UTF-8")
       } catch (error) {
         console.error('Error fetching data:', error)
       }

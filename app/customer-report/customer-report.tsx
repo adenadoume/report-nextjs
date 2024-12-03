@@ -42,21 +42,15 @@ export default function CustomerReportPage({ month }: CustomerReportPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(`Fetching data for ${month}...`);
-        const response = await fetch(`/${month}_customer.csv`);
+        console.log(`Fetching data for ${month}...`)
+        const response = await fetch(`/${month}_customer.csv`)
         const blob = await response.blob()
         const reader = new FileReader()
         
         reader.onload = (e) => {
           const csvText = e.target?.result as string
-          console.log(`CSV content for ${month} (first 200 chars):`, csvText.slice(0, 200));
-
           Papa.parse<CSVRow>(csvText, {
             complete: (result) => {
-              console.log(`Parsed data for ${month} (first 5 rows):`, result.data.slice(0, 5));
-              if (result.errors.length > 0) {
-                console.error(`Parsing errors for ${month}:`, result.errors);
-              }
               const parsedData: SalesData[] = result.data
                 .map((row) => ({
                   Code: row.Code || '',
@@ -64,31 +58,30 @@ export default function CustomerReportPage({ month }: CustomerReportPageProps) {
                   Quantity: parseFloat(row.Quantity || '0'),
                   Value: parseFloat(row.Value || '0')
                 }))
-                .filter((item) => item.Code && item.Customer);
+                .filter((item) => item.Code && item.Customer)
 
-              console.log(`Filtered data for ${month} (first 5 rows):`, parsedData.slice(0, 5));
               const sortedData = parsedData.sort((a, b) => {
                 const customerComparison = a.Customer.localeCompare(b.Customer, 'el')
                 return customerComparison !== 0 ? customerComparison : b.Value - a.Value
-              });
-              setData(sortedData);
-              calculateTotals(sortedData);
-              setCustomers(['All', ...Array.from(new Set(sortedData.map(item => item.Customer)))]);
+              })
+              setData(sortedData)
+              calculateTotals(sortedData)
+              setCustomers(['All', ...Array.from(new Set(sortedData.map(item => item.Customer)))])
             },
             header: true,
             skipEmptyLines: true,
-            encoding: "ISO-8859-7"
-          });
+            encoding: "UTF-8"
+          })
         }
 
-        reader.readAsText(blob, "ISO-8859-7")
+        reader.readAsText(blob, "UTF-8")
       } catch (error) {
-        console.error(`Error fetching data for ${month}:`, error);
+        console.error(`Error fetching data for ${month}:`, error)
       }
-    };
+    }
 
-    fetchData();
-  }, [month]);
+    fetchData()
+  }, [month])
 
   useEffect(() => {
     const fetchYearlyTotal = async () => {
